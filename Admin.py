@@ -161,6 +161,33 @@ def salvar_diversao_em_arquivo(diversao):
 
 #----------------------------------------------------------------Menu de Comodidade--------------------------------------------------------------#
 
+# Lista de codificações possíveis
+codificacoes = ['utf-8', 'latin1', 'cp1252']
+
+# Função para ler o arquivo e imprimir a informação
+def ler_arquivo(arquivo, codificacoes):
+    codigos_zona = []
+    try:
+        df = pd.read_csv(arquivo, encoding='utf-8', header=None, names=['Código', 'Nome', 'Latitude', 'Longitude', 'Descrição'])
+        print(f'Aqui estão as zonas disponíveis.')
+        print(df[['Código', 'Nome', 'Latitude', 'Longitude', 'Descrição']].to_string(index=False))
+        codigos_zona = df['Código'].tolist()
+    except FileNotFoundError:
+        print("Arquivo de zonas não encontrado.")
+    except UnicodeDecodeError:
+        print("")
+        for cod in codificacoes:
+            try:
+                df = pd.read_csv(arquivo, encoding=cod, header=None, names=['Código', 'Nome', 'Latitude', 'Longitude', 'Descrição'])
+                print(f'Aqui estão as zonas disponíveis.')
+                print(df[['Código', 'Nome', 'Latitude', 'Longitude', 'Descrição']].to_string(index=False))
+                codigos_zona = df['Código'].tolist()
+                break
+            except UnicodeDecodeError:
+                pass
+    return codigos_zona
+
+
 class Comodidade:
     def __init__(self, codigo, nome, latitude, longitude, zona_associada, estado_atual, descricao):
         self.codigo = codigo
@@ -172,7 +199,6 @@ class Comodidade:
         self.descricao = descricao
 
     def gerar_codigo(self):
-        # Gera um código aleatório de quatro letras em maiúsculas
         return ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
 
 def criar_comodidade():
@@ -180,7 +206,37 @@ def criar_comodidade():
     nome = input("Nome: ")
     latitude = float(input("Latitude: "))
     longitude = float(input("Longitude: "))
-    zona_associada = input("Zona Associada: ")
+
+    # Lista os códigos de zona disponíveis
+    codigos_zona = ler_arquivo('F:\Python\Projeto-2023-24-main\Arquivos\zonas.csv', codificacoes)
+    if not codigos_zona:
+        print("Não há códigos de zona disponíveis. Crie uma zona primeiro.")
+        time.sleep(2)
+        os.system('cls' if os.name == 'nt' else 'clear')
+        criar()
+    
+    print("Códigos de Zona Disponíveis:")
+    for i, codigo in enumerate(codigos_zona, start=1):
+        print(f"{i}. {codigo}")
+
+    # Solicita ao usuário que escolha um código de zona
+    escolha_zona = input("Escolha o número correspondente ao código de zona desejado: ")
+    
+    try:
+        indice_zona = int(escolha_zona) - 1
+        if 0 <= indice_zona < len(codigos_zona):
+            zona_associada = codigos_zona[indice_zona]
+        else:
+            print("Opção inválida. Tente novamente.")
+            time.sleep(2)
+            os.system('cls' if os.name == 'nt' else 'clear')
+            criar()
+    except ValueError:
+        print("Entrada inválida. Deve ser um número.")
+        time.sleep(2)
+        os.system('cls' if os.name == 'nt' else 'clear')
+        criar()
+
     estado_atual = input("Estado Atual (Aberta/Fechada): ")
     descricao = input("Descrição: ")
 
@@ -217,6 +273,7 @@ def criar_comodidade():
         os.system('cls' if os.name == 'nt' else 'clear')
         criar()
 
+
 def salvar_comodidade_em_arquivo(comodidade):
     pasta_arquivos = "Arquivos"
     if not os.path.exists(pasta_arquivos):
@@ -231,7 +288,7 @@ def salvar_comodidade_em_arquivo(comodidade):
             comodidade.codigo, comodidade.nome, comodidade.latitude, comodidade.longitude,
             comodidade.zona_associada, comodidade.estado_atual, comodidade.descricao
         ])
-
+        
 #----------------------------------------------------------------Menu de Paragem de Comboio--------------------------------------------------------------#
 
 class ParagemComboio:
@@ -375,3 +432,5 @@ def print_menu():
 
 if __name__ == "__main__":
     menu_admin()
+
+
