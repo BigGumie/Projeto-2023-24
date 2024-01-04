@@ -1,39 +1,402 @@
+import keyboard 
 import random #serve para gerar os 4 digitos na criação da zona
 import os # De momento so uso para limpar o terminal
 from colorama import init, Fore, Style #Cores e estilos
 import pandas as pd #Para utilizamento de tabelas
 import time #Para dar tempo entre as funçoes
 import csv #Para criar ficheiros em EXEL
+import menu #Chama o menu.py
 
 init(autoreset=True) #Loop que ja vem com a biblioteca 
 os.system('cls' if os.name == 'nt' else 'clear') #Limpa o terminal
 
+#----------------------------------------------------------------Alterar estado--------------------------------------------------------------#
+def obter_zonas_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'zonas.txt')
+
+    zonas_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_zona = linha.split('\t')[0]
+                zonas_existentes.add(codigo_zona)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'zonas.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'zonas.txt': {e}")
+
+    return zonas_existentes
+
+def alterar_estado_diversao():
+    # Ler o arquivo diversoes.txt
+    arquivo_diversoes = "Arquivos/diversoes.txt"
+
+    try:
+        with open(arquivo_diversoes, mode='r') as file:
+            linhas = file.readlines()
+
+        # Exibir as diversões disponíveis
+        print("\nDiversões Disponíveis:")
+        for linha in linhas:
+            dados_diversao = linha.strip().split('\t')
+            print(f"Código: {dados_diversao[0]}, Nome: {dados_diversao[1]}, Estado Atual: {dados_diversao[3]}")
+
+        # Solicitar ao usuário o código da diversão a ser alterada
+        codigo_diversao = input("\nDigite o código da diversão que deseja alterar: ")
+
+        # Encontrar a diversão com base no código
+        diversao_encontrada = None
+        for i, linha in enumerate(linhas):
+            dados_diversao = linha.strip().split('\t')
+            if dados_diversao[0] == codigo_diversao:
+                diversao_encontrada = dados_diversao
+                break
+
+        if diversao_encontrada:
+            print("\nInformações da Diversão:")
+            print("Código:", diversao_encontrada[0])
+            print("Nome:", diversao_encontrada[1])
+            print("Estado Atual:", diversao_encontrada[3])
+
+            # Solicitar as novas informações
+            novo_nome = input("Digite o novo nome: ")
+            nova_latitude = input("Digite a nova latitude: ")
+            nova_longitude = input("Digite a nova longitude: ")
+            novo_tipo = input("Digite o novo tipo: ")
+            
+            
+            # Verificar se a nova zona_associada é válida
+            zonas_disponiveis = obter_zonas_existentes()
+            zonas_existentes = obter_zonas_existentes()
+            if not zonas_existentes:
+                print("Erro: Não existem zonas cadastradas.")
+                return
+
+            print("Zonas Disponíveis:", ', '.join(zonas_existentes))
+            nova_zona_associada = input("Zona Associada: ").upper()
+            if nova_zona_associada not in zonas_disponiveis:
+                print("Erro: Zona associada não encontrada.")
+                return
+
+            nova_idade_minima = input("Digite a nova idade mínima: ")
+            nova_altura_minima = input("Digite a nova altura mínima: ")
+            nova_intensidade = input("Digite a nova intensidade: ")
+            novo_estado = input("Digite o novo estado (aberto/fechado): ")
+            nova_duracao = input("Digite a nova duração: ")
+            nova_descricao = input("Digite a nova descrição: ")
+
+            # Remover a diversão antiga da lista
+            linhas.pop(i)
+
+            # Atualizar o arquivo diversoes.txt
+            with open(arquivo_diversoes, mode='w') as file:
+                for linha in linhas:
+                    file.write(linha)
+
+                # Escrever a diversão com as informações atualizadas
+                diversao_encontrada[1] = novo_nome
+                diversao_encontrada[2] = nova_latitude
+                diversao_encontrada[3] = nova_longitude
+                diversao_encontrada[4] = novo_tipo
+                diversao_encontrada[5] = nova_zona_associada
+                diversao_encontrada[6] = nova_idade_minima
+                diversao_encontrada[7] = nova_altura_minima
+                diversao_encontrada[8] = nova_intensidade
+                diversao_encontrada[9] = novo_estado
+                diversao_encontrada[10] = nova_duracao
+                diversao_encontrada[11] = nova_descricao
+
+                file.write('\t'.join(diversao_encontrada) + '\n')
+
+            print("Informações da diversão atualizadas com sucesso!")
+        else:
+            print("Diversão não encontrada com o código fornecido.")
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'diversoes.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'diversoes.txt': {e}")
+
+#----------------------------------------------------------------Alterar Comodidade------------------------------------------------------------------#
+def obter_comodidades_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'comodidades.txt')
+
+    comodidades_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_comodidade = linha.split('\t')[0]
+                comodidades_existentes.add(codigo_comodidade)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'comodidades.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'comodidades.txt': {e}")
+
+    return comodidades_existentes
+
+def alterar_info_comodidade():
+    # Ler o arquivo comodidades.txt
+    arquivo_comodidades = "Arquivos/comodidades.txt"
+
+    try:
+        with open(arquivo_comodidades, mode='r') as file:
+            linhas = file.readlines()
+
+        # Exibir as comodidades disponíveis
+        print("\nComodidades Disponíveis:")
+        for linha in linhas:
+            dados_comodidade = linha.strip().split('\t')
+            print(f"Código: {dados_comodidade[0]}, Nome: {dados_comodidade[1]}, Estado Atual: {dados_comodidade[3]}")
+
+        # Solicitar ao usuário o código da comodidade a ser alterada
+        codigo_comodidade = input("\nDigite o código da comodidade que deseja alterar: ")
+
+        # Encontrar a comodidade com base no código
+        comodidade_encontrada = None
+        for i, linha in enumerate(linhas):
+            dados_comodidade = linha.strip().split('\t')
+            if dados_comodidade[0] == codigo_comodidade:
+                comodidade_encontrada = dados_comodidade
+                break
+
+        if comodidade_encontrada:
+            print("\nInformações da Comodidade:")
+            print("Código:", comodidade_encontrada[0])
+            print("Nome:", comodidade_encontrada[1])
+            print("Estado Atual:", comodidade_encontrada[3])
+
+            # Solicitar as novas informações
+            novo_nome = input("Digite o novo nome: ")
+
+            # Verificar se a nova zona_associada é válida
+            zonas_disponiveis = obter_zonas_existentes()
+            if not zonas_disponiveis:
+                print("Erro: Não existem zonas cadastradas.")
+                return
+
+            print("Zonas Disponíveis:", ', '.join(zonas_disponiveis))
+            nova_zona_associada = input("Zona Associada: ").upper()
+            if nova_zona_associada not in zonas_disponiveis:
+                print("Erro: Zona associada não encontrada.")
+                return
+
+            novo_estado = input("Digite o novo estado (aberto/fechado): ")
+
+            # Remover a comodidade antiga da lista
+            linhas.pop(i)
+
+            # Atualizar o arquivo comodidades.txt
+            with open(arquivo_comodidades, mode='w') as file:
+                for linha in linhas:
+                    file.write(linha)
+
+                # Escrever a comodidade com as informações atualizadas
+                comodidade_encontrada[1] = novo_nome
+                comodidade_encontrada[2] = nova_zona_associada
+                comodidade_encontrada[3] = novo_estado
+
+                file.write('\t'.join(comodidade_encontrada) + '\n')
+
+            print("Informações da comodidade atualizadas com sucesso!")
+        else:
+            print("Comodidade não encontrada com o código fornecido.")
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'comodidades.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'comodidades.txt': {e}")
+
+
+#----------------------------------------------------------------Alterar Paragem------------------------------------------------------------------#
+def obter_paragens_comboio_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'paragens_comboio.txt')
+
+    paragens_comboio_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_paragem = linha.split('\t')[0]
+                paragens_comboio_existentes.add(codigo_paragem)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'paragens_comboio.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'paragens_comboio.txt': {e}")
+
+    return paragens_comboio_existentes
+
+def alterar_info_trajecto_comboio():
+    # Ler o arquivo trajectos_comboio.txt
+    arquivo_trajectos_comboio = "Arquivos/trajectos_comboio.txt"
+
+    try:
+        with open(arquivo_trajectos_comboio, mode='r') as file:
+            linhas = file.readlines()
+
+        # Exibir os trajectos de comboio disponíveis
+        print("\nTrajectos de Comboio Disponíveis:")
+        for linha in linhas:
+            dados_trajecto = linha.strip().split('\t')
+            print(f"Código: {dados_trajecto[0]}, Nome: {dados_trajecto[1]}, Estado Atual: {dados_trajecto[4]}, Paragem de Partida: {dados_trajecto[2]}, Paragem de Chegada: {dados_trajecto[3]}")
+
+        # Solicitar ao usuário o código do trajecto a ser alterado
+        codigo_trajecto = input("\nDigite o código do trajecto de comboio que deseja alterar: ")
+
+        # Encontrar o trajecto com base no código
+        trajecto_encontrado = None
+        for i, linha in enumerate(linhas):
+            dados_trajecto = linha.strip().split('\t')
+            if dados_trajecto[0] == codigo_trajecto:
+                trajecto_encontrado = dados_trajecto
+                break
+
+        if trajecto_encontrado:
+            print("\nInformações do Trajecto de Comboio:")
+            print("Código:", trajecto_encontrado[0])
+            print("Nome:", trajecto_encontrado[1])
+            print("Estado Atual:", trajecto_encontrado[4])
+            print("Paragem de Partida:", trajecto_encontrado[2])
+            print("Paragem de Chegada:", trajecto_encontrado[3])
+
+            # Solicitar as novas informações
+            novo_nome = input("Digite o novo nome: ")
+
+            # Verificar se as novas paragens de partida e chegada são válidas
+            paragens_comboio_disponiveis = obter_paragens_comboio_existentes()
+            if not paragens_comboio_disponiveis:
+                print("Erro: Não existem paragens de comboio cadastradas.")
+                return
+
+            print("Paragens de Comboio Disponíveis:", ', '.join(paragens_comboio_disponiveis))
+            nova_paragem_partida = input("Paragem de Partida: ").upper()
+            nova_paragem_chegada = input("Paragem de Chegada: ").upper()
+
+            if nova_paragem_partida not in paragens_comboio_disponiveis or nova_paragem_chegada not in paragens_comboio_disponiveis:
+                print("Erro: Paragem de comboio não encontrada.")
+                return
+
+            novo_estado = input("Digite o novo estado (aberto/fechado): ")
+            nova_periodicidade = input("Digite a nova periodicidade: ")
+
+            # Remover o trajecto antigo da lista
+            linhas.pop(i)
+
+            # Atualizar o arquivo trajectos_comboio.txt
+            with open(arquivo_trajectos_comboio, mode='w') as file:
+                for linha in linhas:
+                    file.write(linha)
+
+                # Escrever o trajecto com as informações atualizadas
+                trajecto_encontrado[1] = novo_nome
+                trajecto_encontrado[2] = nova_paragem_partida
+                trajecto_encontrado[3] = nova_paragem_chegada
+                trajecto_encontrado[4] = novo_estado
+                trajecto_encontrado[5] = nova_periodicidade
+
+                file.write('\t'.join(trajecto_encontrado) + '\n')
+
+            print("Informações do trajecto de comboio atualizadas com sucesso!")
+        else:
+            print("Trajecto de comboio não encontrado com o código fornecido.")
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'trajectos_comboio.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'trajectos_comboio.txt': {e}")
+
+
+#----------------------------------------------------------------Ler os ficheiros para a consulta--------------------------------------------------------------#
+# Função para consultar a lista de diversões
+def consultar_lista_diversoes():
+    print("\nLista de Diversões:")
+    try:
+        with open("Arquivos/diversoes.txt", mode='r') as file:
+            for linha in file:
+                dados_diversao = linha.strip().split('\t')
+                if len(dados_diversao) == 12:  #Verefica se a linhas suficeintes
+                    print("Código:", dados_diversao[0])
+                    print("Nome:", dados_diversao[1])
+                    print("Latitude:", dados_diversao[2])
+                    print("Longitude:", dados_diversao[3])
+                    print("Tipo:", dados_diversao[4])
+                    print("Zona Associada:", dados_diversao[5])
+                    print("Idade Mínima:", dados_diversao[6])
+                    print("Altura Mínima:", dados_diversao[7])
+                    print("Intensidade:", dados_diversao[8])
+                    print("Estado Atual:", dados_diversao[9])
+                    print("Duração:", dados_diversao[10])
+                    print("Descrição:", dados_diversao[11])
+                    print("--------")
+                else:
+                    print(f"Erro: Linha com dados incompletos: {linha}")
+            print("Fim do Loop")
+    except FileNotFoundError:
+        print("Erro: O arquivo 'diversoes.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'diversoes.txt': {e}")
+
+# Função para consultar a lista de comodidades
+def consultar_lista_comodidades():
+    print("\nLista de Comodidades:")
+    try:
+        with open("Arquivos/comodidades.txt", mode='r') as file:
+            for linha in file:
+                dados_comodidade = linha.strip().split('\t')
+                print("Código:", dados_comodidade[0])
+                print("Nome:", dados_comodidade[1])
+                print("Descrição:", dados_comodidade[2])
+                print("--------")
+    except FileNotFoundError:
+        print("Erro: O arquivo 'comodidades.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'comodidades.txt': {e}")
+
+# Função para consultar a lista de zonas
+def consultar_lista_zonas():
+    print("\nLista de Zonas:")
+    try:
+        with open("Arquivos/zonas.txt", mode='r') as file:
+            for linha in file:
+                dados_zona = linha.strip().split('\t')
+                print("Código:", dados_zona[0])
+                print("Nome:", dados_zona[1])
+                print("Latitude:", dados_zona[2])
+                print("Longitude:", dados_zona[3])
+                print("Descrição:", dados_zona[4])
+                print("--------")
+    except FileNotFoundError:
+        print("Erro: O arquivo 'zonas.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'zonas.txt': {e}")
+
 #----------------------------------------------------------------Criar Zona--------------------------------------------------------------#
 class Zona:
-    def __init__(self, nome, latitude, longitude, descricao):
-        self.codigo = self.gerar_codigo() 
+    def __init__(self, codigo, nome, latitude, longitude, descricao):
+        self.codigo = codigo
         self.nome = nome
         self.latitude = latitude
         self.longitude = longitude
         self.descricao = descricao
 
-    def gerar_codigo(self):
-        # Gera um código aleatório de quatro letras em maiúsculas
-        codigo = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))  #Nao ligues ao 65 e 90 é uma cena qualquer para o ASCII entender de A a Z
+    @staticmethod
+    def gerar_codigo():
+        codigo = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
         return codigo
 
 def salvar_zona_em_arquivo(zona):
-
     pasta_arquivos = "Arquivos"
     if not os.path.exists(pasta_arquivos):
         os.makedirs(pasta_arquivos)
 
-    caminho_arquivo = os.path.join(pasta_arquivos, 'zonas.csv')
+    caminho_arquivo = os.path.join(pasta_arquivos, 'zonas.txt')
 
-    #O mode='a' supostamente é "read"??
     with open(caminho_arquivo, mode='a', newline='') as file:
-        writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL) #Tbh nao sei bem para oq isto serve mas no tuturial tinha por isso...
-        writer.writerow([zona.codigo, zona.nome, zona.latitude, zona.longitude, zona.descricao]) #Isto escreve no exel tho
+        file.write(f"{zona.codigo}\t{zona.nome}\t{zona.latitude}\t{zona.longitude}\t{zona.descricao}\n")
 
 def criar_zona():
     print("Criar Nova Zona:")
@@ -42,7 +405,7 @@ def criar_zona():
     longitude = float(input("Longitude: "))
     descricao = input("Descrição: ")
 
-    nova_zona = Zona(nome, latitude, longitude, descricao)
+    nova_zona = Zona(Zona.gerar_codigo(), nome, latitude, longitude, descricao)
 
     print("\nInformações da Nova Zona:")
     print("Código:", nova_zona.codigo)
@@ -58,14 +421,9 @@ def criar_zona():
         print("Zona salva com sucesso!")
         time.sleep(2)
         os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
-    else:
-        print("Operação cancelada. A zona não foi salva.")
-        time.sleep(2)
-        os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
         
 #----------------------------------------------------------------Criar Diversao--------------------------------------------------------------#
+
 class Diversao:
     def __init__(self, codigo, nome, latitude, longitude, tipo, zona_associada, idade_minima, altura_minima, intensidade, estado_atual, duracao, descricao):
         self.codigo = codigo
@@ -81,39 +439,64 @@ class Diversao:
         self.duracao = duracao
         self.descricao = descricao
 
-def gerar_codigo():
-    return ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+    @staticmethod
+    def gerar_codigo():
+        codigo = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+        return codigo
 
+def obter_zonas_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'zonas.txt')
+
+    zonas_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_zona = linha.split('\t')[0]
+                zonas_existentes.add(codigo_zona)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'zonas.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'zonas.txt': {e}")
+
+    return zonas_existentes
+
+def validar_tipo_estado():
+    while True:
+        estado = input("Estado (aberto/fechado): ").lower()
+        if estado in ['aberto', 'fechado']:
+            return estado
+        else:
+            print("Erro: Por favor, digite 'aberto' ou 'fechado'.")
 
 def criar_diversao():
     print("Criar Nova Diversão:")
     nome = input("Nome: ")
     latitude = float(input("Latitude: "))
     longitude = float(input("Longitude: "))
-    tipo = input("Tipo: ")
-    zona_associada = input("Zona Associada: ")
+
+    zonas_existentes = obter_zonas_existentes()
+    if not zonas_existentes:
+        print("Erro: Não existem zonas disponiveis.")
+        return
+
+    print("Zonas Disponíveis:", ', '.join(zonas_existentes))
+    zona_associada = input("Zona Associada: ").upper()
+    if zona_associada not in zonas_existentes:
+        print("Erro: Zona não encontrada.")
+        return
+
+    tipo = validar_tipo_estado()
     idade_minima = int(input("Idade Mínima: "))
     altura_minima = float(input("Altura Mínima: "))
-    intensidade = input("Intensidade: ")
-    estado_atual = input("Estado Atual (Aberto/Fechado): ")
-    duracao = input("Duração: ")
+    intensidade = input("Intensidade (Baixo/Médio/Alto/Extremo): ").capitalize()
+    estado_atual = validar_tipo_estado()
+    duracao = float(input("Duração (em minutos): "))
     descricao = input("Descrição: ")
 
-    nova_diversao = Diversao(
-        codigo=gerar_codigo(),
-        nome=nome,
-        latitude=latitude,
-        longitude=longitude,
-        tipo=tipo,
-        zona_associada=zona_associada,
-        idade_minima=idade_minima,
-        altura_minima=altura_minima,
-        intensidade=intensidade,
-        estado_atual=estado_atual,
-        duracao=duracao,
-        descricao=descricao
-    )
-    
+    nova_diversao = Diversao(Diversao.gerar_codigo(), nome, latitude, longitude, tipo, zona_associada, idade_minima, altura_minima, intensidade, estado_atual, duracao, descricao)
+
     print("\nInformações da Nova Diversão:")
     print("Código:", nova_diversao.codigo)
     print("Nome:", nova_diversao.nome)
@@ -135,59 +518,18 @@ def criar_diversao():
         print("Diversão salva com sucesso!")
         time.sleep(2)
         os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
-    else:
-        print("Operação cancelada. A diversão não foi salva.")
-        time.sleep(2)
-        os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
 
 def salvar_diversao_em_arquivo(diversao):
     pasta_arquivos = "Arquivos"
     if not os.path.exists(pasta_arquivos):
         os.makedirs(pasta_arquivos)
 
-    caminho_arquivo = os.path.join(pasta_arquivos, 'diversoes.csv')
+    caminho_arquivo = os.path.join(pasta_arquivos, 'diversoes.txt')
 
     with open(caminho_arquivo, mode='a', newline='') as file:
-        writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        
-        writer.writerow([
-            diversao.codigo, diversao.nome, diversao.latitude, diversao.longitude,
-            diversao.tipo, diversao.zona_associada, diversao.idade_minima,
-            diversao.altura_minima, diversao.intensidade, diversao.estado_atual,
-            diversao.duracao, diversao.descricao
-        ])
+        file.write(f"{diversao.codigo}\t{diversao.nome}\t{diversao.latitude}\t{diversao.longitude}\t{diversao.tipo}\t{diversao.zona_associada}\t{diversao.idade_minima}\t{diversao.altura_minima}\t{diversao.intensidade}\t{diversao.estado_atual}\t{diversao.duracao}\t{diversao.descricao}\n")
 
 #----------------------------------------------------------------Menu de Comodidade--------------------------------------------------------------#
-
-# Lista de codificações possíveis
-codificacoes = ['utf-8', 'latin1', 'cp1252']
-
-# Função para ler o arquivo e imprimir a informação
-def ler_arquivo(arquivo, codificacoes):
-    codigos_zona = []
-    try:
-        df = pd.read_csv(arquivo, encoding='utf-8', header=None, names=['Código', 'Nome', 'Latitude', 'Longitude', 'Descrição'])
-        print(f'Aqui estão as zonas disponíveis.')
-        print(df[['Código', 'Nome', 'Latitude', 'Longitude', 'Descrição']].to_string(index=False))
-        codigos_zona = df['Código'].tolist()
-    except FileNotFoundError:
-        print("Arquivo de zonas não encontrado.")
-    except UnicodeDecodeError:
-        print("")
-        for cod in codificacoes:
-            try:
-                df = pd.read_csv(arquivo, encoding=cod, header=None, names=['Código', 'Nome', 'Latitude', 'Longitude', 'Descrição'])
-                print(f'Aqui estão as zonas disponíveis.')
-                print(df[['Código', 'Nome', 'Latitude', 'Longitude', 'Descrição']].to_string(index=False))
-                codigos_zona = df['Código'].tolist()
-                break
-            except UnicodeDecodeError:
-                pass
-    return codigos_zona
-
-
 class Comodidade:
     def __init__(self, codigo, nome, latitude, longitude, zona_associada, estado_atual, descricao):
         self.codigo = codigo
@@ -198,8 +540,36 @@ class Comodidade:
         self.estado_atual = estado_atual
         self.descricao = descricao
 
-    def gerar_codigo(self):
-        return ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+    @staticmethod
+    def gerar_codigo():
+        codigo = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+        return codigo
+
+def obter_zonas_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'zonas.txt')
+
+    zonas_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_zona = linha.split('\t')[0]
+                zonas_existentes.add(codigo_zona)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'zonas.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'zonas.txt': {e}")
+
+    return zonas_existentes
+
+def validar_estado():
+    while True:
+        estado = input("Estado (aberto/fechado): ").lower()
+        if estado in ['aberto', 'fechado']:
+            return estado
+        else:
+            print("Erro: Por favor, digite 'aberto' ou 'fechado'.")
 
 def criar_comodidade():
     print("Criar Nova Comodidade:")
@@ -207,48 +577,21 @@ def criar_comodidade():
     latitude = float(input("Latitude: "))
     longitude = float(input("Longitude: "))
 
-    # Lista os códigos de zona disponíveis
-    codigos_zona = ler_arquivo('F:\Python\Projeto-2023-24-main\Arquivos\zonas.csv', codificacoes)
-    if not codigos_zona:
-        print("Não há códigos de zona disponíveis. Crie uma zona primeiro.")
-        time.sleep(2)
-        os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
-    
-    print("Códigos de Zona Disponíveis:")
-    for i, codigo in enumerate(codigos_zona, start=1):
-        print(f"{i}. {codigo}")
+    zonas_existentes = obter_zonas_existentes()
+    if not zonas_existentes:
+        print("Erro: Não existem zonas cadastradas.")
+        return
 
-    # Solicita ao usuário que escolha um código de zona
-    escolha_zona = input("Escolha o número correspondente ao código de zona desejado: ")
-    
-    try:
-        indice_zona = int(escolha_zona) - 1
-        if 0 <= indice_zona < len(codigos_zona):
-            zona_associada = codigos_zona[indice_zona]
-        else:
-            print("Opção inválida. Tente novamente.")
-            time.sleep(2)
-            os.system('cls' if os.name == 'nt' else 'clear')
-            criar()
-    except ValueError:
-        print("Entrada inválida. Deve ser um número.")
-        time.sleep(2)
-        os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
+    print("Zonas Disponíveis:", ', '.join(zonas_existentes))
+    zona_associada = input("Zona Associada: ").upper()
+    if zona_associada not in zonas_existentes:
+        print("Erro: Zona não encontrada.")
+        return
 
-    estado_atual = input("Estado Atual (Aberta/Fechada): ")
+    estado_atual = validar_estado()
     descricao = input("Descrição: ")
 
-    nova_comodidade = Comodidade(
-        codigo=gerar_codigo(), 
-        nome=nome,
-        latitude=latitude,
-        longitude=longitude,
-        zona_associada=zona_associada,
-        estado_atual=estado_atual,
-        descricao=descricao
-    )
+    nova_comodidade = Comodidade(Comodidade.gerar_codigo(), nome, latitude, longitude, zona_associada, estado_atual, descricao)
 
     print("\nInformações da Nova Comodidade:")
     print("Código:", nova_comodidade.codigo)
@@ -266,67 +609,89 @@ def criar_comodidade():
         print("Comodidade salva com sucesso!")
         time.sleep(2)
         os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
-    else:
-        print("Operação cancelada. A comodidade não foi salva.")
-        time.sleep(2)
-        os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
-
 
 def salvar_comodidade_em_arquivo(comodidade):
     pasta_arquivos = "Arquivos"
     if not os.path.exists(pasta_arquivos):
         os.makedirs(pasta_arquivos)
 
-    caminho_arquivo = os.path.join(pasta_arquivos, 'comodidades.csv')
+    caminho_arquivo = os.path.join(pasta_arquivos, 'comodidades.txt')
 
     with open(caminho_arquivo, mode='a', newline='') as file:
-        writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        
-        writer.writerow([
-            comodidade.codigo, comodidade.nome, comodidade.latitude, comodidade.longitude,
-            comodidade.zona_associada, comodidade.estado_atual, comodidade.descricao
-        ])
-        
-#----------------------------------------------------------------Menu de Paragem de Comboio--------------------------------------------------------------#
+        file.write(f"{comodidade.codigo}\t{comodidade.nome}\t{comodidade.latitude}\t{comodidade.longitude}\t{comodidade.zona_associada}\t{comodidade.estado_atual}\t{comodidade.descricao}\n")
+
+#----------------------------------------------------------------Criar Paragem de Comboio--------------------------------------------------------------#
 
 class ParagemComboio:
-    def __init__(self, codigo, nome, zona_associada, latitude, longitude, descricao):
+    def __init__(self, codigo, nome, zona_associada, latitude, longitude, estado_atual, descricao):
         self.codigo = codigo
         self.nome = nome
         self.zona_associada = zona_associada
         self.latitude = latitude
         self.longitude = longitude
+        self.estado_atual = estado_atual
         self.descricao = descricao
 
-    def gerar_codigo(self):
-        # Gera um código aleatório de quatro letras em maiúsculas
-        return ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+    @staticmethod
+    def gerar_codigo():
+        codigo = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+        return codigo
+
+def obter_zonas_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'zonas.txt')
+
+    zonas_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_zona = linha.split('\t')[0]
+                zonas_existentes.add(codigo_zona)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'zonas.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'zonas.txt': {e}")
+
+    return zonas_existentes
+
+def validar_estado():
+    while True:
+        estado = input("Estado (aberto/fechado): ").lower()
+        if estado in ['aberto', 'fechado']:
+            return estado
+        else:
+            print("Erro: Por favor, digite 'aberto' ou 'fechado'.")
 
 def criar_paragem_comboio():
     print("Criar Nova Paragem de Comboio:")
     nome = input("Nome: ")
-    zona_associada = input("Zona Associada: ")
     latitude = float(input("Latitude: "))
     longitude = float(input("Longitude: "))
+
+    zonas_existentes = obter_zonas_existentes()
+    if not zonas_existentes:
+        print("Erro: Não existem zonas cadastradas.")
+        return
+
+    print("Zonas Disponíveis:", ', '.join(zonas_existentes))
+    zona_associada = input("Zona Associada: ").upper()
+    if zona_associada not in zonas_existentes:
+        print("Erro: Zona não encontrada.")
+        return
+
+    estado_atual = validar_estado()
     descricao = input("Descrição: ")
 
-    nova_paragem_comboio = ParagemComboio(
-        codigo=gerar_codigo(),
-        nome=nome,
-        zona_associada=zona_associada,
-        latitude=latitude,
-        longitude=longitude,
-        descricao=descricao
-    )
+    nova_paragem_comboio = ParagemComboio(ParagemComboio.gerar_codigo(), nome, zona_associada, latitude, longitude, estado_atual, descricao)
 
     print("\nInformações da Nova Paragem de Comboio:")
     print("Código:", nova_paragem_comboio.codigo)
     print("Nome:", nova_paragem_comboio.nome)
-    print("Zona Associada:", nova_paragem_comboio.zona_associada)
     print("Latitude:", nova_paragem_comboio.latitude)
     print("Longitude:", nova_paragem_comboio.longitude)
+    print("Zona Associada:", nova_paragem_comboio.zona_associada)
+    print("Estado Atual:", nova_paragem_comboio.estado_atual)
     print("Descrição:", nova_paragem_comboio.descricao)
 
     salvar = input("\nDeseja salvar a nova paragem de comboio? (s/n): ").lower()
@@ -336,33 +701,190 @@ def criar_paragem_comboio():
         print("Paragem de Comboio salva com sucesso!")
         time.sleep(2)
         os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
-    else:
-        print("Operação cancelada. A paragem de comboio não foi salva.")
-        time.sleep(2)
-        os.system('cls' if os.name == 'nt' else 'clear')
-        criar()
 
 def salvar_paragem_comboio_em_arquivo(paragem_comboio):
     pasta_arquivos = "Arquivos"
     if not os.path.exists(pasta_arquivos):
         os.makedirs(pasta_arquivos)
 
-    caminho_arquivo = os.path.join(pasta_arquivos, 'paragens_comboio.csv')
+    caminho_arquivo = os.path.join(pasta_arquivos, 'paragens_comboio.txt')
 
     with open(caminho_arquivo, mode='a', newline='') as file:
-        writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        
-        writer.writerow([
-            paragem_comboio.codigo, paragem_comboio.nome, paragem_comboio.zona_associada,
-            paragem_comboio.latitude, paragem_comboio.longitude, paragem_comboio.descricao
-        ])
+        file.write(f"{paragem_comboio.codigo}\t{paragem_comboio.nome}\t{paragem_comboio.zona_associada}\t{paragem_comboio.latitude}\t{paragem_comboio.longitude}\t{paragem_comboio.estado_atual}\t{paragem_comboio.descricao}\n")
+
+
+#----------------------------------------------------------------Criar Ligação Comboios--------------------------------------------------------------#
+
+class LigacaoComboio:
+    def __init__(self, codigo, paragem_inicio, paragem_fim, distancia):
+        self.codigo = codigo
+        self.paragem_inicio = paragem_inicio
+        self.paragem_fim = paragem_fim
+        self.distancia = distancia
+
+    @staticmethod
+    def gerar_codigo():
+        codigo = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+        return codigo
+
+def obter_paragens_comboio_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'paragens_comboio.txt')
+
+    paragens_comboio_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_paragem = linha.split('\t')[0]
+                paragens_comboio_existentes.add(codigo_paragem)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'paragens_comboio.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'paragens_comboio.txt': {e}")
+
+    return paragens_comboio_existentes
+
+def criar_ligacao_comboio():
+    print("Criar Nova Ligação de Comboio:")
+    
+    paragens_existentes = obter_paragens_comboio_existentes()
+    if not paragens_existentes:
+        print("Erro: Não existem paragens de comboio cadastradas.")
+        return
+
+    print("Paragens Disponíveis:", ', '.join(paragens_existentes))
+    paragem_inicio_codigo = input("Código da Paragem de Início: ")
+    paragem_fim_codigo = input("Código da Paragem de Fim: ")
+
+    if paragem_inicio_codigo not in paragens_existentes or paragem_fim_codigo not in paragens_existentes:
+        print("Erro: Paragem de comboio não encontrada.")
+        return
+
+    distancia = float(input("Distância entre as paragens (em km): "))
+
+    nova_ligacao_comboio = LigacaoComboio(LigacaoComboio.gerar_codigo(), paragem_inicio_codigo, paragem_fim_codigo, distancia)
+
+
+    print("\nInformações da Nova Ligação de Comboio:")
+    print("Código:", nova_ligacao_comboio.codigo)
+    print("Paragem de Início:", nova_ligacao_comboio.paragem_inicio)
+    print("Paragem de Fim:", nova_ligacao_comboio.paragem_fim)
+    print("Distância:", nova_ligacao_comboio.distancia, "km")
+
+    salvar = input("\nDeseja salvar a nova ligação de comboio? (s/n): ").lower()
+    
+    if salvar == 's':
+        salvar_ligacao_comboio_em_arquivo(nova_ligacao_comboio)
+        print("Ligação de Comboio salva com sucesso!")
+        time.sleep(2)
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+def salvar_ligacao_comboio_em_arquivo(ligacao_comboio):
+    pasta_arquivos = "Arquivos"
+    if not os.path.exists(pasta_arquivos):
+        os.makedirs(pasta_arquivos)
+
+    caminho_arquivo = os.path.join(pasta_arquivos, 'ligacoes_comboio.txt')
+
+    with open(caminho_arquivo, mode='a', newline='') as file:
+        file.write(f"{ligacao_comboio.codigo}\t{ligacao_comboio.paragem_inicio}\t{ligacao_comboio.paragem_fim}\t{ligacao_comboio.distancia}\n")
+
+#----------------------------------------------------------------Criar trajecto Comboios--------------------------------------------------------------#
+class TrajectoComboio:
+    def __init__(self, codigo, nome, paragem_partida, paragem_chegada, estado_atual, periodicidade):
+        self.codigo = codigo
+        self.nome = nome
+        self.paragem_partida = paragem_partida
+        self.paragem_chegada = paragem_chegada
+        self.estado_atual = estado_atual
+        self.periodicidade = periodicidade
+
+    @staticmethod
+    def gerar_codigo():
+        codigo = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+        return codigo
+
+def obter_paragens_comboio_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'paragens_comboio.txt')
+
+    paragens_comboio_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_paragem = linha.split('\t')[0]
+                paragens_comboio_existentes.add(codigo_paragem)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'paragens_comboio.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'paragens_comboio.txt': {e}")
+
+    return paragens_comboio_existentes
+
+# Função para criar um trajecto de comboio
+def criar_trajecto_comboio():
+    print("Criar Novo Trajecto de Comboio:")
+
+    paragens_existentes = obter_paragens_comboio_existentes()
+    if not paragens_existentes:
+        print("Erro: Não existem paragens de comboio cadastradas.")
+        return
+
+    print("Paragens Disponíveis:", ', '.join(paragens_existentes))
+    
+    nome = input("Nome do Trajecto: ")
+    paragem_partida = input("Código da Paragem de Partida: ")
+    paragem_chegada = input("Código da Paragem de Chegada: ")
+
+    if paragem_partida not in paragens_existentes or paragem_chegada not in paragens_existentes:
+        print("Erro: Paragem de comboio não encontrada.")
+        return
+
+    # Validar o estado atual
+    while True:
+        estado_atual = input("Estado Atual do Trajecto (aberto/fechado): ").lower()
+        if estado_atual in ['aberto', 'fechado']:
+            break
+        else:
+            print("Erro: Por favor, escolha entre 'aberto' ou 'fechado'.") 
+    periodicidade = input("Periodicidade do Trajecto: ")
+
+    novo_trajecto_comboio = TrajectoComboio(TrajectoComboio.gerar_codigo(), nome, paragem_partida, paragem_chegada, estado_atual, periodicidade)
+
+    print("\nInformações do Novo Trajecto de Comboio:")
+    print("Código:", novo_trajecto_comboio.codigo)
+    print("Nome:", novo_trajecto_comboio.nome)
+    print("Paragem de Partida:", novo_trajecto_comboio.paragem_partida)
+    print("Paragem de Chegada:", novo_trajecto_comboio.paragem_chegada)
+    print("Estado Atual:", novo_trajecto_comboio.estado_atual)
+    print("Periodicidade:", novo_trajecto_comboio.periodicidade)
+
+    salvar = input("\nDeseja salvar o novo trajecto de comboio? (s/n): ").lower()
+
+    if salvar == 's':
+        salvar_trajecto_comboio_em_arquivo(novo_trajecto_comboio)
+        print("Trajecto de Comboio salvo com sucesso!")
+        time.sleep(2)
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+def salvar_trajecto_comboio_em_arquivo(trajecto_comboio):
+    pasta_arquivos = "Arquivos"
+    if not os.path.exists(pasta_arquivos):
+        os.makedirs(pasta_arquivos)
+
+    caminho_arquivo = os.path.join(pasta_arquivos, 'trajectos_comboio.txt')
+
+    with open(caminho_arquivo, mode='a', newline='') as file:
+        file.write(f"{trajecto_comboio.codigo}\t{trajecto_comboio.nome}\t{trajecto_comboio.paragem_partida}\t{trajecto_comboio.paragem_chegada}\t{trajecto_comboio.estado_atual}\t{trajecto_comboio.periodicidade}\n")
+
 
 #----------------------------------------------------------------Menu de Criação--------------------------------------------------------------#
 def criar():
     os.system('cls' if os.name == 'nt' else 'clear')
     print(Fore.GREEN + Style.BRIGHT + "+" + "-" * 55 + "|    Criar    |" + "-" * 55 + "+")
-    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 33 + "| 8. Procurar |" + " " * 33 + "| 9. Voltar |" + " " * 32 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 33 + "| 7. Procurar |" + " " * 33 + "| 9. Voltar |" + " " * 32 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 125 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 125 + "|")
@@ -370,7 +892,7 @@ def criar():
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 125 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 125 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 125 + "|")
-    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 5 + "| 4. Criar uma paragem de comboio |" + " " * 5 + "| 6. Criar uma ligação de 2 paragens |" + " " * 5 + "| 7. Criar trajecto de comboio |" + " " * 5 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 5 + "| 4. Criar uma paragem de comboio |" + " " * 5 + "| 5. Criar uma ligação de 2 paragens |" + " " * 5 + "| 6. Criar trajecto de comboio |" + " " * 5 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 125 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 125 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 125 + "|")
@@ -383,11 +905,83 @@ def criar():
         elif escolha == '2':
             criar_diversao()
         elif escolha == '3':
-            criar_comodidade() 
+            criar_comodidade()
+        elif escolha == '4':
+            criar_paragem_comboio()
+        elif escolha == '5':
+            criar_ligacao_comboio()
+        elif escolha == '6':
+            criar_trajecto_comboio()
+        elif escolha == '9':
+            menu_admin() 
         else:
             print(Fore.LIGHTRED_EX + "Opção inválida. Tente novamente.")
 
 Opcao_criar = ("criar", "1")
+
+#----------------------------------------------------------------Menu Alterar--------------------------------------------------------------#
+def menu_alterar():
+    while True:
+        print_alterar()
+        print(Fore.GREEN + Style.BRIGHT + "|" + "↓ " * 26 + "↓ Escolha uma opção ↓" + " ↓" * 26 + "|")
+        escolha = input(" " * 53 + Fore.GREEN + "→" + Style.BRIGHT + Fore.LIGHTCYAN_EX )
+
+        if escolha == '1':
+            alterar_estado_diversao()
+        elif escolha == '2':
+            alterar_info_comodidade()
+        elif escolha == '3':
+            alterar_info_trajecto_comboio()
+
+        elif escolha == '9':
+            menu_admin()
+        else:
+            print(Fore.LIGHTRED_EX + "Opção inválida. Tente novamente.")
+def print_alterar():
+    print(Fore.GREEN + Style.BRIGHT + "+" + "-" * 53 + "|    Alterar    |" + "-" * 52 + "+|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 12 + "| 1. Diversoes |" + " " * 12 + "| 2. Comodidades |" + " " * 12 + "| 3. Trajetos |" + " " * 12 + "| 9. Voltar |" + " " * 15 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")         
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")   
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")     
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")  
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+
+#----------------------------------------------------------------Menu Consultar--------------------------------------------------------------#
+def menu_consultar():
+    while True:
+        print_consultar()
+        print(Fore.GREEN + Style.BRIGHT + "|" + "↓ " * 26 + "↓ Escolha uma opção ↓" + " ↓" * 26 + "|")
+        escolha = input(" " * 53 + Fore.GREEN + "→" + Style.BRIGHT + Fore.LIGHTCYAN_EX )
+
+        if escolha == '1':
+            consultar_lista_diversoes()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de consulta" + "|")
+            keyboard.read_event(suppress=True)  # Aguarda que uma tecla seja pressionada
+        elif escolha == '2':
+            consultar_lista_comodidades()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de consulta" + "|")
+            keyboard.read_event(suppress=True)  # Aguarda que uma tecla seja pressionada
+        elif escolha == '3':
+            consultar_lista_zonas()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de consulta" + "|")
+            keyboard.read_event(suppress=True)  # Aguarda que uma tecla seja pressionada
+        elif escolha == '9':
+            menu_admin()
+        else:
+            print(Fore.LIGHTRED_EX + "Opção inválida. Tente novamente.")
+def print_consultar():
+    print(Fore.GREEN + Style.BRIGHT + "+" + "-" * 53 + "|    Consultar    |" + "-" * 52 + "+|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 12 + "| 1. Diversoes |" + " " * 12 + "| 2. Comodidades |" + " " * 12 + "| 3. Zonas |" + " " * 12 + "| 9. Voltar |" + " " * 18 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")         
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")   
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")     
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")  
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+
 
 #----------------------------------------------------------------Menu Principal--------------------------------------------------------------#
 def menu_admin():
@@ -397,25 +991,36 @@ def menu_admin():
         escolha = input(" " * 53 + Fore.GREEN + "→" + Style.BRIGHT + Fore.LIGHTCYAN_EX )
 
         if escolha.lower() in Opcao_criar:
-            print("lol")
             criar()
-        elif escolha == 'alterar':
-            print("Alterar")
-        elif escolha == 'bilhetes':
+        elif escolha == 'alterar' or escolha == '2':
+            menu_alterar()
+        elif escolha == 'bilhetes' or escolha == '3':
             print("Bilhetes")
-        elif escolha == 'Alterar':
-            print("Alterar")
-        elif escolha == '3':
-            print(Fore.RED + "Encerrando...")
-            break
-        else:
-            print(Fore.LIGHTRED_EX + "Opção inválida. Tente novamente.")
+        elif escolha == 'procurar' or escolha == '4':
+            print("procurar")
+        elif escolha == 'consultar' or escolha == '5':
+            menu_consultar()
+        elif escolha == 'Encerrar' or escolha == '0':
+            exit()    
+        elif escolha == '6':
+            opcao = input("\nDeseja voltar a pagina de login? (s/n): ").lower()
+    
+            if opcao == 's':
+                print("A voltar a pagina de login")
+                time.sleep(2)
+                os.system('cls' if os.name == 'nt' else 'clear')
+                menu.menu_principal()
+            else:
+                print("A voltar ao menu inicial")
+                time.sleep(2)
+                os.system('cls' if os.name == 'nt' else 'clear')
+                menu_admin()
 
 def print_menu():
     
-    print(Fore.GREEN + Style.BRIGHT + "+" + "-" * 51 + "|    Administração    |" + "-" * 51 + "+|")
+    print(Fore.GREEN + Style.BRIGHT + "+" + "-" * 51 + "|    Administração    |" + "-" * 50 + "+|")
     print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
-    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 3 + "| 1 .Criar |" + " " * 7 + "| 2. Alterar |" + " " * 7 + "| 3. Bilhetes |" + " " * 7 + "| 4. Procurar |" + " " * 7 + "| 5. Log out |" + " " * 7 + "| 0. Encerrar |" + " " * 2 +"|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 3 + "| 1 .Criar |" + " " * 3 + "| 2. Alterar |" + " " * 3 + "| 3. Bilhetes |" + " " * 3 + "| 4. Procurar |" + " " * 3 + "| 5. Consultar |" + " " * 4 +"| 6. Log out |" + " " * 3 + "| 0. Encerrar |" + " " * 2 +"|")
     print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "  ___       __   _______   ___       ________  ________  _____ ______    _______        " + " " * 15 +"|")         
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + " |\  \     |\  \|\  ___ \ |\  \     |\   ____\|\   __  \|\   _ \  _   \|\  ___ \        " + " " * 15 +"|")         
@@ -432,5 +1037,3 @@ def print_menu():
 
 if __name__ == "__main__":
     menu_admin()
-
-
