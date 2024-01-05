@@ -1,0 +1,2 @@
+1	Normal	30	Bilhete  normal
+2	VIP	100	Bilhete VIP 

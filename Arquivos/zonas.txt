@@ -1,0 +1,2 @@
+NFTM	Zona Teste 1	22.0	33.0	Alguma coisa
+ZPPN	Zona 3	22.0	33.0	Zona 3

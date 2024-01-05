@@ -1,0 +1,2 @@
+IEVT	Diversao 2 (novo)	44	22	aberto	NFTM	12	155	alta	aberto	20	Nova diversao 2
+AKJZ	Diversao 1 (nova)	22	41	aberto	NFTM	11	165	media	fechado	20	Nova diversao 1 

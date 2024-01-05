@@ -4,11 +4,594 @@ import os # De momento so uso para limpar o terminal
 from colorama import init, Fore, Style #Cores e estilos
 import pandas as pd #Para utilizamento de tabelas
 import time #Para dar tempo entre as funçoes
-import csv #Para criar ficheiros em EXEL
 import menu #Chama o menu.py
+import datetime
 
 init(autoreset=True) #Loop que ja vem com a biblioteca 
 os.system('cls' if os.name == 'nt' else 'clear') #Limpa o terminal
+
+#---------------------------------------------------------------Exclusivo User.py ---------------------------------------------------------#
+
+#---------------------------------------------------------------Obter Zonas ---------------------------------------------------------#
+def obter_zonas_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'zonas.txt')
+
+    zonas_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_zona = linha.split('\t')[0]
+                zonas_existentes.add(codigo_zona)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'zonas.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'zonas.txt': {e}")
+
+    return zonas_existentes
+
+def consultar_zona_detalhe():
+    zonas_disponiveis = obter_zonas_existentes()
+
+    if not zonas_disponiveis:
+        print("Erro: Não existem zonas cadastradas.")
+        return
+
+    print("Zonas Disponíveis:", ', '.join(zonas_disponiveis))
+    codigo_zona = input("Digite o código da zona que deseja consultar em detalhe: ")
+
+    try:
+        with open("Arquivos/zonas.txt", mode='r') as file:
+            for linha in file:
+                dados_zona = linha.strip().split('\t')
+                if dados_zona[0] == codigo_zona:
+                    print("\nDetalhes da Zona:")
+                    print("Código:", dados_zona[0])
+                    print("Nome:", dados_zona[1])
+                    print("Descrição:", dados_zona[2])
+                    return
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'zonas.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao consultar a zona em detalhe: {e}")
+
+    print("Zona não encontrada com o código fornecido.")
+
+#---------------------------------------------------------------Obter Diversoes ---------------------------------------------------------#
+def obter_diversoes_existentes():
+    arquivo_diversoes = "Arquivos/diversoes.txt"
+
+    diversoes_existentes = set()
+
+    try:
+        with open(arquivo_diversoes, mode='r') as file:
+            for linha in file:
+                codigo_diversao = linha.split('\t')[0]
+                diversoes_existentes.add(codigo_diversao)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'diversoes.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'diversoes.txt': {e}")
+
+    return diversoes_existentes
+
+def consultar_diversao_detalhe():
+    diversoes_disponiveis = obter_diversoes_existentes()
+
+    if not diversoes_disponiveis:
+        print("Erro: Não existem diversões cadastradas.")
+        return
+
+    print("Diversões Disponíveis:", ', '.join(diversoes_disponiveis))
+    codigo_diversao = input("Digite o código da diversão que deseja consultar em detalhe: ")
+
+    try:
+        with open("Arquivos/diversoes.txt", mode='r') as file:
+            for linha in file:
+                dados_diversao = linha.strip().split('\t')
+                if dados_diversao[0] == codigo_diversao:
+                    print("\nDetalhes da Diversão:")
+                    print("Código:", dados_diversao[0])
+                    print("Nome:", dados_diversao[1])
+                    print("Latitude:", dados_diversao[2])
+                    print("Longitude:", dados_diversao[3])
+                    print("Tipo:", dados_diversao[4])
+                    print("Zona Associada:", dados_diversao[5])
+                    print("Idade Mínima:", dados_diversao[6])
+                    print("Altura Mínima:", dados_diversao[7])
+                    print("Intensidade:", dados_diversao[8])
+                    print("Estado Atual:", dados_diversao[9])
+                    print("Duração:", dados_diversao[10])
+                    print("Descrição:", dados_diversao[11])
+                    return
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'diversoes.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao consultar a diversão em detalhe: {e}")
+
+    print("Diversão não encontrada com o código fornecido.")
+
+#---------------------------------------------------------------Obter Bilhetes data ---------------------------------------------------------#
+def listar_bilhetes_emitidos():
+    try:
+        with open("Arquivos/bilhetes.txt", mode='r') as file:
+            bilhetes = [linha.strip().split('\t') for linha in file]
+            return bilhetes
+    except FileNotFoundError:
+        return []
+
+def listar_bilhetes_por_data():
+    print("Listar Bilhetes Emitidos por Data:")
+    bilhetes_emitidos = listar_bilhetes_emitidos()
+
+    if not bilhetes_emitidos:
+        print("Nenhum bilhete foi emitido ainda.")
+        return
+
+    data_str = input("Digite a data (DD/MM/AAAA) para listar os bilhetes emitidos: ")
+
+    try:
+        data_procurada = datetime.strptime(data_str, "%d/%m/%Y")
+    except ValueError:
+        print("Erro: Formato de data inválido. Use o formato DD/MM/AAAA.")
+        return
+
+    bilhetes_encontrados = []
+
+    for bilhete in bilhetes_emitidos:
+        data_inicio = datetime(int(bilhete[6]), int(bilhete[5]), int(bilhete[4]))
+        data_fim = datetime(int(bilhete[9]), int(bilhete[8]), int(bilhete[7]))
+
+        if data_procurada >= data_inicio and data_procurada <= data_fim:
+            bilhetes_encontrados.append(bilhete)
+
+    if not bilhetes_encontrados:
+        print("Nenhum bilhete encontrado para a data fornecida.")
+    else:
+        print("\nBilhetes Emitidos na Data Especificada:")
+        for bilhete in bilhetes_encontrados:
+            print("\nReferência:", bilhete[0])
+            print("Nome da Pessoa:", bilhete[1])
+            print("Nacionalidade:", bilhete[2])
+            print("Tipo de Bilhete:", bilhete[3])
+            print("Data de Início:", f"{bilhete[4]}/{bilhete[5]}/{bilhete[6]}")
+            print("Data de Fim:", f"{bilhete[7]}/{bilhete[8]}/{bilhete[9]}")
+
+#---------------------------------------------------------------Obter Trajecto ---------------------------------------------------------#
+    
+def obter_zonas_existentes():
+    pasta_arquivos = "Arquivos"
+    caminho_arquivo = os.path.join(pasta_arquivos, 'zonas.txt')
+
+    zonas_existentes = set()
+
+    try:
+        with open(caminho_arquivo, mode='r') as file:
+            for linha in file:
+                codigo_zona = linha.split('\t')[0]
+                zonas_existentes.add(codigo_zona)
+    except FileNotFoundError:
+        print("Erro: O arquivo 'zonas.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'zonas.txt': {e}")
+
+    return zonas_existentes
+
+def procurar_trajetos_comboio_por_zona_inicial():
+    print("Procurar Trajetos de Comboio por Zona Inicial:")
+
+    zonas_disponiveis = obter_zonas_existentes()
+
+    if not zonas_disponiveis:
+        print("Erro: Não existem zonas cadastradas.")
+        return
+
+    print("Zonas Disponíveis:", ', '.join(zonas_disponiveis))
+    zona_inicial = input("Digite a zona inicial para procurar trajetos de comboio: ").upper()
+
+    arquivo_trajectos_comboio = "Arquivos/trajectos_comboio.txt"
+
+    try:
+        with open(arquivo_trajectos_comboio, mode='r') as file:
+            encontrou_trajeto = False
+            for linha in file:
+                dados_trajecto = linha.strip().split('\t')
+                if dados_trajecto[2] == zona_inicial:
+                    encontrou_trajeto = True
+                    print("\nDetalhes do Trajeto de Comboio:")
+                    print("Código:", dados_trajecto[0])
+                    print("Nome:", dados_trajecto[1])
+                    print("Paragem de Partida:", dados_trajecto[2])
+                    print("Paragem de Chegada:", dados_trajecto[3])
+                    print("Duração:", dados_trajecto[4])
+
+            if not encontrou_trajeto:
+                print("Nenhum trajeto de comboio encontrado para a zona inicial fornecida.")
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'trajectos_comboio.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao procurar trajetos de comboio: {e}")
+
+
+#---------------------------------------------------------------Bilhetes ---------------------------------------------------------#
+
+class TipoBilhete:
+    def __init__(self, codigo, nome, duracao, descricao):
+        self.codigo = codigo
+        self.nome = nome
+        self.duracao = duracao
+        self.descricao = descricao
+
+    @staticmethod
+    def gerar_codigo():
+        codigo = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(4))
+        return codigo
+
+def obter_tipos_bilhetes():
+    tipos_bilhetes = []
+    arquivo_tipos_bilhetes = "Arquivos/tipos_bilhetes.txt"
+
+    try:
+        if not os.path.exists(arquivo_tipos_bilhetes):
+            with open(arquivo_tipos_bilhetes, mode='w') as new_file:
+                pass 
+
+        with open(arquivo_tipos_bilhetes, mode='r') as file:
+            for linha in file:
+                dados_tipo_bilhete = linha.strip().split('\t')
+                tipo_bilhete = TipoBilhete(*dados_tipo_bilhete)
+                tipos_bilhetes.append(tipo_bilhete)
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'tipos_bilhetes.txt': {e}")
+
+    return tipos_bilhetes
+
+
+
+class Bilhete:
+    def __init__(self, referencia, nome_pessoa, nacionalidade, tipo_bilhete, dia_inicio, mes_inicio, ano_inicio, dia_fim, mes_fim, ano_fim):
+        self.referencia = referencia
+        self.nome_pessoa = nome_pessoa
+        self.nacionalidade = nacionalidade
+        self.tipo_bilhete = tipo_bilhete
+        self.data_inicio = datetime.date(ano_inicio, mes_inicio, dia_inicio)
+        self.data_fim = datetime.date(ano_fim, mes_fim, dia_fim)
+
+    @staticmethod
+    def gerar_referencia():
+        referencia = ''.join(random.choice(chr(random.randint(65, 90))) for _ in range(8))
+        return referencia
+
+def emitir_bilhete():
+    print("Emissão de Bilhete:")
+    
+    tipos_bilhetes = obter_tipos_bilhetes()
+    if not tipos_bilhetes:
+        print("Erro: Não existem tipos de bilhetes cadastrados.")
+        return
+
+    print("Tipos de Bilhetes Disponíveis:")
+    for tipo_bilhete in tipos_bilhetes:
+        print(f"{tipo_bilhete.codigo}: {tipo_bilhete.nome} - {tipo_bilhete.descricao}")
+
+    codigo_tipo_bilhete = input("Digite o código do tipo de bilhete desejado: ")
+    
+    tipo_bilhete_escolhido = None
+    for tipo_bilhete in tipos_bilhetes:
+        if tipo_bilhete.codigo == codigo_tipo_bilhete:
+            tipo_bilhete_escolhido = tipo_bilhete
+            break
+
+    if not tipo_bilhete_escolhido:
+        print("Erro: Tipo de bilhete não encontrado.")
+        return
+
+    nome_pessoa = input("Digite o nome da pessoa: ")
+    nacionalidade = input("Digite a nacionalidade: ")
+    dia_inicio = int(input("Digite o dia de início: "))
+    mes_inicio = int(input("Digite o mês de início: "))
+    ano_inicio = int(input("Digite o ano de início: "))
+    dia_fim = int(input("Digite o dia de fim: "))
+    mes_fim = int(input("Digite o mês de fim: "))
+    ano_fim = int(input("Digite o ano de fim: "))
+
+    nova_referencia = Bilhete.gerar_referencia()
+    novo_bilhete = Bilhete(nova_referencia, nome_pessoa, nacionalidade, tipo_bilhete_escolhido, dia_inicio, mes_inicio, ano_inicio, dia_fim, mes_fim, ano_fim)
+
+    print("\nInformações do Novo Bilhete:")
+    print("Referência:", novo_bilhete.referencia)
+    print("Nome da Pessoa:", novo_bilhete.nome_pessoa)
+    print("Nacionalidade:", novo_bilhete.nacionalidade)
+    print("Tipo de Bilhete:", f"{tipo_bilhete_escolhido.nome} - {tipo_bilhete_escolhido.descricao}")
+    print("Data de Início:", novo_bilhete.data_inicio.strftime("%d/%m/%Y"))
+    print("Data de Fim:", novo_bilhete.data_fim.strftime("%d/%m/%Y"))
+
+    salvar_bilhete(novo_bilhete)
+
+def salvar_bilhete(bilhete):
+    arquivo_bilhetes = "Arquivos/bilhetes.txt"
+
+    try:
+        with open(arquivo_bilhetes, mode='a') as file:
+            file.write(f"{bilhete.referencia}\t{bilhete.nome_pessoa}\t{bilhete.nacionalidade}\t"
+                       f"{bilhete.tipo_bilhete.codigo}\t{bilhete.data_inicio.day}\t{bilhete.data_inicio.month}\t{bilhete.data_inicio.year}\t"
+                       f"{bilhete.data_fim.day}\t{bilhete.data_fim.month}\t{bilhete.data_fim.year}\n")
+        print("Bilhete emitido com sucesso!")
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'bilhetes.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao salvar o bilhete: {e}")
+
+def listar_bilhetes_emitidos():
+    print("Listagem de Bilhetes Emitidos:")
+    try:
+        with open("Arquivos/bilhetes.txt", mode='r') as file:
+            for linha in file:
+                dados_bilhete = linha.strip().split('\t')
+                print("Referência:", dados_bilhete[0])
+                print("Nome da Pessoa:", dados_bilhete[1])
+                print("Nacionalidade:", dados_bilhete[2])
+                codigo_tipo_bilhete = dados_bilhete[3]
+                tipo_bilhete = obter_tipo_bilhete_por_codigo(codigo_tipo_bilhete)
+                print("Tipo de Bilhete:", f"{tipo_bilhete.nome} - {tipo_bilhete.descricao}")
+                print("Data de Início:", f"{dados_bilhete[4]}/{dados_bilhete[5]}/{dados_bilhete[6]}")
+                print("Data de Fim:", f"{dados_bilhete[7]}/{dados_bilhete[8]}/{dados_bilhete[9]}")
+                print("--------")
+
+    except FileNotFoundError:
+        print("Nenhum bilhete foi emitido ainda.")
+    except Exception as e:
+        print(f"Erro inesperado ao listar os bilhetes emitidos: {e}")
+
+def obter_tipo_bilhete_por_codigo(codigo):
+    tipos_bilhetes = obter_tipos_bilhetes()
+    for tipo_bilhete in tipos_bilhetes:
+        if tipo_bilhete.codigo == codigo:
+            return tipo_bilhete
+    return None
+
+def listar_referencias_bilhetes():
+    try:
+        with open("Arquivos/bilhetes.txt", mode='r') as file:
+            referencias = [linha.strip().split('\t')[0] for linha in file]
+            return referencias
+    except FileNotFoundError:
+        return []
+
+def procurar_bilhete_por_referencia():
+    print("Procura de Bilhete por Referência:")
+    
+    referencias_disponiveis = listar_referencias_bilhetes()
+    
+    if not referencias_disponiveis:
+        print("Nenhum bilhete foi emitido ainda.")
+        return
+
+    print("Referências Disponíveis:")
+    for referencia in referencias_disponiveis:
+        print(referencia)
+
+    referencia_desejada = input("Digite a referência do bilhete que deseja procurar: ")
+
+    try:
+        with open("Arquivos/bilhetes.txt", mode='r') as file:
+            for linha in file:
+                dados_bilhete = linha.strip().split('\t')
+                if dados_bilhete[0] == referencia_desejada:
+                    print("Referência:", dados_bilhete[0])
+                    print("Nome da Pessoa:", dados_bilhete[1])
+                    print("Nacionalidade:", dados_bilhete[2])
+                    codigo_tipo_bilhete = dados_bilhete[3]
+                    tipo_bilhete = obter_tipo_bilhete_por_codigo(codigo_tipo_bilhete)
+                    print("Tipo de Bilhete:", f"{tipo_bilhete.nome} - {tipo_bilhete.descricao}")
+                    print("Data de Início:", f"{dados_bilhete[4]}/{dados_bilhete[5]}/{dados_bilhete[6]}")
+                    print("Data de Fim:", f"{dados_bilhete[7]}/{dados_bilhete[8]}/{dados_bilhete[9]}")
+                    return
+
+    except FileNotFoundError:
+        print("Nenhum bilhete foi emitido ainda.")
+    except Exception as e:
+        print(f"Erro inesperado ao procurar o bilhete por referência: {e}")
+    print("Bilhete não encontrado.")
+
+
+
+def obter_ultimo_codigo():
+    try:
+        with open("Arquivos/tipos_bilhetes.txt", mode='r') as file:
+            linhas = file.readlines()
+            if linhas:
+                ultimo_codigo = int(linhas[-1].split('\t')[0])
+                return ultimo_codigo + 1
+            else:
+                return 1
+    except FileNotFoundError:
+        return 1
+    except Exception as e:
+        print(f"Erro ao obter o último código: {e}")
+        return 1
+
+def criar_tipo_bilhete():
+    print("Criação de Tipo de Bilhete:")
+    
+    novo_codigo = obter_ultimo_codigo()
+    nome = input("Digite o nome do tipo de bilhete: ")
+    duracao = input("Digite a duração do tipo de bilhete: ")
+    descricao = input("Digite a descrição do tipo de bilhete: ")
+
+    novo_tipo_bilhete = TipoBilhete(novo_codigo, nome, duracao, descricao)
+
+    print("\nNovo Tipo de Bilhete Criado:")
+    print("Código:", novo_tipo_bilhete.codigo)
+    print("Nome:", novo_tipo_bilhete.nome)
+    print("Duração:", novo_tipo_bilhete.duracao)
+    print("Descrição:", novo_tipo_bilhete.descricao)
+
+    salvar_tipo_bilhete(novo_tipo_bilhete)
+
+def salvar_tipo_bilhete(tipo_bilhete):
+    try:
+        with open("Arquivos/tipos_bilhetes.txt", mode='a') as file:
+            file.write(f"{tipo_bilhete.codigo}\t{tipo_bilhete.nome}\t{tipo_bilhete.duracao}\t{tipo_bilhete.descricao}\n")
+        print("Tipo de bilhete salvo com sucesso.")
+    except Exception as e:
+        print(f"Erro ao salvar o tipo de bilhete: {e}")
+
+
+def mostrar_referencias_disponiveis():
+    referencias = listar_referencias_bilhetes()
+
+    if not referencias:
+        print("Nenhum bilhete foi emitido ainda.")
+        return
+
+    print("Referências Disponíveis:")
+    for referencia in referencias:
+        print(referencia)
+
+#---------------------------------------------------------------Procurar Diversoes---------------------------------------------------------#
+
+def procurar_diversoes():
+    print("Opções de Pesquisa:")
+    zonas_disponiveis = obter_zonas_existentes()
+    tipos_disponiveis = ["aberto", "fechado"]
+    intensidades_disponiveis = ["alta", "media", "baixa"]
+
+    zona = input(f"Zona ({', '.join(zonas_disponiveis)}) (deixe em branco para ignorar): ").upper()
+    tipo = input(f"Tipo ({', '.join(tipos_disponiveis)}) (deixe em branco para ignorar): ").lower()
+    intensidade = input(f"Intensidade ({', '.join(intensidades_disponiveis)}) (deixe em branco para ignorar): ").lower()
+    estado = input("Estado (deixe em branco para ignorar): ")
+
+    # Restrições de entrada
+    if zona and zona not in zonas_disponiveis:
+        print("Erro: Zona inválida.")
+        return
+    if tipo and tipo not in tipos_disponiveis:
+        print("Erro: Tipo inválido.")
+        return
+    if intensidade and intensidade not in intensidades_disponiveis:
+        print("Erro: Intensidade inválida.")
+        return
+
+    arquivo_diversoes = "Arquivos/diversoes.txt"
+
+    try:
+        with open(arquivo_diversoes, mode='r') as file:
+            for linha in file:
+                dados_diversao = linha.strip().split('\t')
+
+                # Filtros
+                if (not zona or dados_diversao[5] == zona) and \
+                   (not tipo or dados_diversao[9] == tipo) and \
+                   (not intensidade or dados_diversao[8] == intensidade) and \
+                   (not estado or dados_diversao[4] == estado):
+                    print("Código:", dados_diversao[0])
+                    print("Nome:", dados_diversao[1])
+                    print("Latitude:", dados_diversao[2])
+                    print("Longitude:", dados_diversao[3])
+                    print("Tipo:", dados_diversao[4])
+                    print("Zona Associada:", dados_diversao[5])
+                    print("Idade Mínima:", dados_diversao[6])
+                    print("Altura Mínima:", dados_diversao[7])
+                    print("Intensidade:", dados_diversao[8])
+                    print("Estado:", dados_diversao[9])
+                    print("Duração:", dados_diversao[10])
+                    print("Descrição:", dados_diversao[11])
+                    print("--------")
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'diversoes.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'diversoes.txt': {e}")
+
+#---------------------------------------------------------------Procurar comodidades---------------------------------------------------------#
+
+def procurar_comodidades():
+    print("Opções de Pesquisa:")
+    zonas_disponiveis = obter_zonas_existentes()
+    tipos_disponiveis = ["aberto", "fechado"]
+
+    zona = input(f"Zona ({', '.join(zonas_disponiveis)}) (deixe em branco para ignorar): ").upper()
+    tipo = input(f"Tipo ({', '.join(tipos_disponiveis)}) (deixe em branco para ignorar): ").lower()
+    estado = input("Estado (deixe em branco para ignorar): ")
+
+    # Restrições de entrada
+    if zona and zona not in zonas_disponiveis:
+        print("Erro: Zona inválida.")
+        return
+    if tipo and tipo not in tipos_disponiveis:
+        print("Erro: Tipo inválido.")
+        return
+
+    arquivo_comodidades = "Arquivos/comodidades.txt"
+
+    try:
+        with open(arquivo_comodidades, mode='r') as file:
+            for linha in file:
+                dados_comodidade = linha.strip().split('\t')
+
+                # Filtros
+                if (not zona or dados_comodidade[2] == zona) and \
+                   (not tipo or dados_comodidade[3] == tipo) and \
+                   (not estado or dados_comodidade[4] == estado):
+                   
+                    print("Código:", dados_comodidade[0])
+                    print("Nome:", dados_comodidade[1])
+                    print("Zona Associada:", dados_comodidade[2])
+                    print("Estado:", dados_comodidade[3])
+                    print("Descricao:", dados_comodidade[6])
+                    print("--------")
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'comodidades.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'comodidades.txt': {e}")
+
+
+#---------------------------------------------------------------Procurar trejectos---------------------------------------------------------#
+
+def procurar_trajectos_comboio():
+    print("Opções de Pesquisa:")
+    zonas_disponiveis = obter_zonas_existentes()
+    zona_inicial = input(f"Zona Inicial ({', '.join(zonas_disponiveis)}) (deixe em branco para ignorar): ").upper()
+    ordenacao_ascendente = input("Ordenação Ascendente (s/n): ").lower() == 's'
+
+    arquivo_trajectos_comboio = "Arquivos/trajectos_comboio.txt"
+
+    try:
+        with open(arquivo_trajectos_comboio, mode='r') as file:
+            linhas = file.readlines()
+
+            # Filtros
+            trajectos_filtrados = []
+            for linha in linhas:
+                dados_trajecto = linha.strip().split('\t')
+                if (not zona_inicial or dados_trajecto[2] == zona_inicial):
+                    trajectos_filtrados.append(dados_trajecto)
+
+            # Ordenação
+            trajectos_filtrados.sort(key=lambda x: x[2], reverse=not ordenacao_ascendente)
+
+            # Exibição
+            for trajecto in trajectos_filtrados:
+                print("Código:", trajecto[0])
+                print("Nome:", trajecto[1])
+                print("Paragem de Partida:", trajecto[2])
+                print("Paragem de Chegada:", trajecto[3])
+                print("Estado Atual:", trajecto[4])
+                print("Periodicidade:", trajecto[5])
+                print("--------")
+
+    except FileNotFoundError:
+        print("Erro: O arquivo 'trajectos_comboio.txt' não foi encontrado.")
+    except Exception as e:
+        print(f"Erro inesperado ao ler 'trajectos_comboio.txt': {e}")
+
 
 #----------------------------------------------------------------Alterar estado--------------------------------------------------------------#
 def obter_zonas_existentes():
@@ -421,6 +1004,7 @@ def criar_zona():
         print("Zona salva com sucesso!")
         time.sleep(2)
         os.system('cls' if os.name == 'nt' else 'clear')
+        criar()
         
 #----------------------------------------------------------------Criar Diversao--------------------------------------------------------------#
 
@@ -919,6 +1503,40 @@ def criar():
 
 Opcao_criar = ("criar", "1")
 
+#----------------------------------------------------------------Menu Procurar--------------------------------------------------------------#
+def menu_procurar():
+    while True:
+        print_procurar()
+        print(Fore.GREEN + Style.BRIGHT + "|" + "↓ " * 26 + "↓ Escolha uma opção ↓" + " ↓" * 26 + "|")
+        escolha = input(" " * 53 + Fore.GREEN + "→" + Style.BRIGHT + Fore.LIGHTCYAN_EX )
+
+        if escolha == '1':
+            procurar_diversoes()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de procurar" + "|")
+            keyboard.read_event(suppress=True)  # Aguarda que uma tecla seja pressionada
+        elif escolha == '2':
+            procurar_comodidades()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de procurar" + "|")
+            keyboard.read_event(suppress=True)  # Aguarda que uma tecla seja pressionada
+        elif escolha == '3':
+            procurar_trajectos_comboio()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de procurar" + "|")
+            keyboard.read_event(suppress=True)  # Aguarda que uma tecla seja pressionada
+        elif escolha == '9':
+            menu_admin()
+        else:
+            print(Fore.LIGHTRED_EX + "Opção inválida. Tente novamente.")
+def print_procurar():
+    print(Fore.GREEN + Style.BRIGHT + "+" + "-" * 53 + "|    Procurar    |" + "-" * 52 + "+|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 12 + "| 1. Diversoes |" + " " * 12 + "| 2. Comodidades |" + " " * 12 + "| 3. Trajectos |" + " " * 12 + "| 9. Voltar |" + " " * 14 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")         
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")   
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")     
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")  
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+
 #----------------------------------------------------------------Menu Alterar--------------------------------------------------------------#
 def menu_alterar():
     while True:
@@ -946,6 +1564,49 @@ def print_alterar():
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")   
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")     
     print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")  
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+
+#----------------------------------------------------------------Menu Bilhetes--------------------------------------------------------------#
+    
+def menu_bilhete():
+    while True:
+        print_bilhete()
+        print(Fore.GREEN + Style.BRIGHT + "|" + "↓ " * 26 + "↓ Escolha uma opção ↓" + " ↓" * 26 + "|")
+        escolha = input(" " * 53 + Fore.GREEN + "→" + Style.BRIGHT + Fore.LIGHTCYAN_EX )
+
+        if escolha == '1':
+            emitir_bilhete()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de Bilhete" + "|")
+            keyboard.read_event(suppress=True)  
+        elif escolha == '2':
+            listar_bilhetes_emitidos()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de Bilhete" + "|")
+            keyboard.read_event(suppress=True)  
+        elif escolha == '3':
+            procurar_bilhete_por_referencia()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de Bilhete" + "|")
+            keyboard.read_event(suppress=True)  
+        elif escolha == '4':
+            mostrar_referencias_disponiveis()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de Bilhete" + "|")
+            keyboard.read_event(suppress=True)  
+            keyboard.read_event(suppress=True)  
+        elif escolha == '5':
+            criar_tipo_bilhete()
+            print(Fore.GREEN + Style.BRIGHT + "|" + "Clique em alguma tecla para voltar ao menu de Bilhete" + "|")
+            keyboard.read_event(suppress=True)  
+        elif escolha == '9':
+            menu_admin()
+        else:
+            print(Fore.LIGHTRED_EX + "Opção inválida. Tente novamente.")
+def print_bilhete():
+    print(Fore.GREEN + Style.BRIGHT + "+" + "-" * 53 + "|    Bilhetes    |" + "-" * 52 + "+|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|") 
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 9 + "| 1. Emitir |" + " " * 9 + "| 2. Listar |" + " " * 9 + "| 3. Procurar |" + " " * 9 + "| 4. Referencia |" +" " * 9 + "| 9. Voltar |" + " " * 9 + "|")
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")         
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 52 + "| 5. Criar tipo |" + " " * 56 + "|")  
+    print(Fore.GREEN + Style.BRIGHT + "|" + " " * 22 + "                                                                                        " + " " * 15 +"|")      
     print(Fore.GREEN + Style.BRIGHT + "|" + "-" * 125 + "|")
 
 #----------------------------------------------------------------Menu Consultar--------------------------------------------------------------#
@@ -995,9 +1656,11 @@ def menu_admin():
         elif escolha == 'alterar' or escolha == '2':
             menu_alterar()
         elif escolha == 'bilhetes' or escolha == '3':
+            menu_bilhete()
             print("Bilhetes")
         elif escolha == 'procurar' or escolha == '4':
             print("procurar")
+            menu_procurar()
         elif escolha == 'consultar' or escolha == '5':
             menu_consultar()
         elif escolha == 'Encerrar' or escolha == '0':
