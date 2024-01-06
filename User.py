@@ -31,7 +31,7 @@ def menu_usuario():
         elif escolha == "4":
             Admin.consultar_lista_zonas()
         elif escolha == "5":
-            Admin.obter_diversoes_existentes()
+            Admin.consultar_diversao_em_detalhe()
         elif escolha == "6":
             Admin.procurar_diversoes()
         elif escolha == "7":

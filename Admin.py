@@ -60,59 +60,64 @@ def consultar_zona_detalhe():
     print("Zona não encontrada com o código fornecido.")
 
 #---------------------------------------------------------------Obter Diversoes ---------------------------------------------------------#
-def obter_diversoes_existentes():
-    arquivo_diversoes = "Arquivos/diversoes.txt"
-
-    diversoes_existentes = set()
-
+    
+def obter_dados_diversao_por_codigo(codigo):
     try:
-        with open(arquivo_diversoes, mode='r') as file:
+        with open("Arquivos/diversoes.txt", mode='r') as file:
             for linha in file:
-                codigo_diversao = linha.split('\t')[0]
-                diversoes_existentes.add(codigo_diversao)
+                dados_diversao = linha.strip().split('\t')
+                if dados_diversao[0] == codigo:
+                    return dados_diversao
     except FileNotFoundError:
         print("Erro: O arquivo 'diversoes.txt' não foi encontrado.")
     except Exception as e:
         print(f"Erro inesperado ao ler 'diversoes.txt': {e}")
+    return None
 
-    return diversoes_existentes
+def listar_diversoes_disponiveis():
+    try:
+        with open("Arquivos/diversoes.txt", mode='r') as file:
+            diversoes = [linha.strip().split('\t') for linha in file]
+            return diversoes
+    except FileNotFoundError:
+        return []
 
-def consultar_diversao_detalhe():
-    diversoes_disponiveis = obter_diversoes_existentes()
+def consultar_diversao_em_detalhe():
+    print("Consultar Diversão em Detalhe:")
+    
+    diversoes_disponiveis = listar_diversoes_disponiveis()
 
     if not diversoes_disponiveis:
         print("Erro: Não existem diversões cadastradas.")
         return
 
-    print("Diversões Disponíveis:", ', '.join(diversoes_disponiveis))
-    codigo_diversao = input("Digite o código da diversão que deseja consultar em detalhe: ")
+    print("Diversões Disponíveis:")
+    for diversao in diversoes_disponiveis:
+        print(f"Código: {diversao[0]}, Nome: {diversao[1]}")
 
-    try:
-        with open("Arquivos/diversoes.txt", mode='r') as file:
-            for linha in file:
-                dados_diversao = linha.strip().split('\t')
-                if dados_diversao[0] == codigo_diversao:
-                    print("\nDetalhes da Diversão:")
-                    print("Código:", dados_diversao[0])
-                    print("Nome:", dados_diversao[1])
-                    print("Latitude:", dados_diversao[2])
-                    print("Longitude:", dados_diversao[3])
-                    print("Tipo:", dados_diversao[4])
-                    print("Zona Associada:", dados_diversao[5])
-                    print("Idade Mínima:", dados_diversao[6])
-                    print("Altura Mínima:", dados_diversao[7])
-                    print("Intensidade:", dados_diversao[8])
-                    print("Estado Atual:", dados_diversao[9])
-                    print("Duração:", dados_diversao[10])
-                    print("Descrição:", dados_diversao[11])
-                    return
+    codigo_diversao = input("Digite o código da diversão que deseja consultar: ")
 
-    except FileNotFoundError:
-        print("Erro: O arquivo 'diversoes.txt' não foi encontrado.")
-    except Exception as e:
-        print(f"Erro inesperado ao consultar a diversão em detalhe: {e}")
+    diversao_encontrada = obter_dados_diversao_por_codigo(codigo_diversao)
 
-    print("Diversão não encontrada com o código fornecido.")
+    if diversao_encontrada:
+        print("\nInformações da Diversão:")
+        print(f"Código: {diversao_encontrada[0]}")
+        print(f"Nome: {diversao_encontrada[1]}")
+        print(f"Latitude: {diversao_encontrada[2]}")
+        print(f"Longitude: {diversao_encontrada[3]}")
+        print(f"Tipo: {diversao_encontrada[4]}")
+        print(f"Zona Associada: {diversao_encontrada[5]}")
+        print(f"Idade Mínima: {diversao_encontrada[6]}")
+        print(f"Altura Mínima: {diversao_encontrada[7]}")
+        print(f"Intensidade: {diversao_encontrada[8]}")
+        print(f"Estado Atual: {diversao_encontrada[9]}")
+        print(f"Duracao: {diversao_encontrada[10]}")
+        print(f"Descrição: {diversao_encontrada[11]}")
+    else:
+        print("Diversão não encontrada com o código fornecido.")
+
+
+
 
 #---------------------------------------------------------------Obter Bilhetes data ---------------------------------------------------------#
 def listar_bilhetes_emitidos():
